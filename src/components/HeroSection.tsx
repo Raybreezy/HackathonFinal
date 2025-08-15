@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Calendar, MapPin } from "lucide-react";
-import roboticsImage from "/Users/lawrenceopferkuch/Downloads/banner.jpeg";
+import roboticsImage from "/banner.jpeg";
 
 export function HeroSection() {
   return (

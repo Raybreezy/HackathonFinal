@@ -1,5 +1,5 @@
 
-import robotDemoImage from '/Users/lawrenceopferkuch/Downloads/roboverse.png';
+import robotDemoImage from '/sponsors/roboverse.png';
 
 export function AboutSection() {
   return (
