@@ -3,7 +3,11 @@ import { Badge } from "./ui/badge";
 import { Calendar, MapPin } from "lucide-react";
 import roboticsImage from "/banner.jpeg";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onRegisterClick: () => void;
+}
+
+export function HeroSection({ onRegisterClick }: HeroSectionProps) {
   return (
     <section 
       className="relative h-screen flex items-center justify-center px-6"
@@ -45,11 +49,9 @@ export function HeroSection() {
           <Button 
             size="lg" 
             className="text-lg px-8 py-6 bg-white text-black hover:bg-white/90"
-            asChild
+            onClick={onRegisterClick}
           >
-            <a href="https://forms.gle/6LT7XW5mNpEt6ueg7" target="_blank" rel="noopener noreferrer">
-              Register Now
-            </a>
+            Register Now
           </Button>
           <Button 
             variant="outline" 
