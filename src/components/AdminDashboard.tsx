@@ -17,7 +17,7 @@ export function AdminDashboard() {
   const [filteredApplicants, setFilteredApplicants] = useState<Applicant[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [skillFilter, setSkillFilter] = useState<string>("");
+
   const [teamFilter, setTeamFilter] = useState<string>("");
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
 
@@ -27,7 +27,7 @@ export function AdminDashboard() {
 
   useEffect(() => {
     filterApplicants();
-  }, [applicants, searchTerm, skillFilter, teamFilter]);
+  }, [applicants, searchTerm, teamFilter]);
 
   const fetchApplicants = async () => {
     try {
@@ -53,17 +53,11 @@ export function AdminDashboard() {
     if (searchTerm) {
       filtered = filtered.filter(applicant =>
         applicant.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.university.toLowerCase().includes(searchTerm.toLowerCase())
+        applicant.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Skill filter
-    if (skillFilter) {
-      filtered = filtered.filter(applicant =>
-        applicant.skills?.includes(skillFilter)
-      );
-    }
+
 
     // Team preference filter
     if (teamFilter) {
@@ -77,7 +71,7 @@ export function AdminDashboard() {
 
   const exportToCSV = () => {
     const headers = [
-      'Name', 'Email', 'University', 'Track', 'Skills', 'Team Preference', 'Created At'
+      'Name', 'Email', 'Track', 'Team Preference', 'Team Members', 'Created At'
     ];
 
     const csvContent = [
@@ -85,10 +79,9 @@ export function AdminDashboard() {
       ...filteredApplicants.map(applicant => [
         applicant.full_name,
         applicant.email,
-        applicant.university,
         applicant.track_selection,
-        applicant.skills?.join('; ') || '',
         applicant.team_preference,
+        applicant.team_members ? applicant.team_members.filter(email => email && email.trim() !== '').join('; ') : '',
         new Date(applicant.created_at || '').toLocaleDateString()
       ].join(','))
     ].join('\n');
@@ -102,10 +95,7 @@ export function AdminDashboard() {
     window.URL.revokeObjectURL(url);
   };
 
-  const getSkillOptions = () => {
-    const allSkills = applicants.flatMap(applicant => applicant.skills || []);
-    return [...new Set(allSkills)].sort();
-  };
+
 
   if (loading) {
     return (
@@ -162,9 +152,9 @@ export function AdminDashboard() {
             <div className="flex items-center space-x-2">
               <MapPin className="h-5 w-5 text-blue-500" />
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Universities</p>
+                <p className="text-sm font-medium text-muted-foreground">Beginner Track</p>
                 <p className="text-2xl font-bold">
-                  {new Set(applicants.map(app => app.university)).size}
+                  {applicants.filter(app => app.track_selection === 'beginner').length}
                 </p>
               </div>
             </div>
@@ -202,7 +192,7 @@ export function AdminDashboard() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search"
-                  placeholder="Name, email, university..."
+                  placeholder="Name, email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -210,20 +200,7 @@ export function AdminDashboard() {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="skill-filter">Filter by Skill</Label>
-              <Select value={skillFilter} onValueChange={setSkillFilter}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="All skills" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All skills</SelectItem>
-                  {getSkillOptions().map((skill) => (
-                    <SelectItem key={skill} value={skill}>{skill}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+
 
             <div>
               <Label htmlFor="team-filter">Team Preference</Label>
@@ -235,7 +212,7 @@ export function AdminDashboard() {
                   <SelectItem value="">All preferences</SelectItem>
                   <SelectItem value="individual">Individual</SelectItem>
                   <SelectItem value="team">Team</SelectItem>
-                  <SelectItem value="no_preference">No preference</SelectItem>
+                  <SelectItem value="have_team">Have a team</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -264,10 +241,8 @@ export function AdminDashboard() {
             <TableHeader>
               <TableRow>
                 <TableHead>Applicant</TableHead>
-                <TableHead>University</TableHead>
-                <TableHead>Skills</TableHead>
+                <TableHead>Track</TableHead>
                 <TableHead>Team Preference</TableHead>
-
                 <TableHead>Applied</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -282,31 +257,19 @@ export function AdminDashboard() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div>
-                      <p className="font-medium">{applicant.university}</p>
-                      <p className="text-sm text-muted-foreground">Track: {applicant.track_selection === 'beginner' ? 'Beginner' : 'Advanced'}</p>
-                    </div>
+                    <Badge variant={applicant.track_selection === 'beginner' ? 'secondary' : 'default'}>
+                      {applicant.track_selection === 'beginner' ? 'Beginner' : 'Advanced'}
+                    </Badge>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {applicant.skills?.slice(0, 3).map((skill) => (
-                        <Badge key={skill} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                      {applicant.skills && applicant.skills.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{applicant.skills.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
+
                   <TableCell>
                     <Badge variant={
                       applicant.team_preference === 'individual' ? 'default' :
                       applicant.team_preference === 'team' ? 'secondary' : 'outline'
                     }>
-                      {applicant.team_preference?.replace('_', ' ')}
+                      {applicant.team_preference === 'individual' ? 'Individual' : 
+                       applicant.team_preference === 'team' ? 'Team' : 
+                       applicant.team_preference === 'have_team' ? 'Have a team' : applicant.team_preference}
                     </Badge>
                   </TableCell>
 
@@ -360,27 +323,12 @@ export function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="font-medium">University</Label>
-                  <p className="text-sm">{selectedApplicant.university}</p>
-                </div>
-                <div>
-                  <Label className="font-medium">Track</Label>
-                  <p className="text-sm">{selectedApplicant.track_selection === 'beginner' ? 'Beginner Track' : 'Advanced Track'}</p>
-                </div>
+              <div>
+                <Label className="font-medium">Track</Label>
+                <p className="text-sm">{selectedApplicant.track_selection === 'beginner' ? 'Beginner Track' : 'Advanced Track'}</p>
               </div>
 
-              <div>
-                <Label className="font-medium">Skills</Label>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {selectedApplicant.skills?.map((skill) => (
-                    <Badge key={skill} variant="secondary">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+
 
               <div>
                 <Label className="font-medium">Experience</Label>
@@ -398,8 +346,29 @@ export function AdminDashboard() {
 
               <div>
                 <Label className="font-medium">Team Preference</Label>
-                <p className="text-sm">{selectedApplicant.team_preference}</p>
+                <p className="text-sm">
+                  {selectedApplicant.team_preference === 'individual' ? 'Work individually' : 
+                   selectedApplicant.team_preference === 'team' ? 'Join a team' : 
+                   selectedApplicant.team_preference === 'have_team' ? 'Have a team' : selectedApplicant.team_preference}
+                </p>
               </div>
+
+              {/* Show team members if they have a team */}
+              {selectedApplicant.team_preference === 'have_team' && selectedApplicant.team_members && (
+                <div>
+                  <Label className="font-medium">Team Members</Label>
+                  <div className="mt-1 space-y-1">
+                    {selectedApplicant.team_members
+                      .filter(email => email && email.trim() !== '')
+                      .map((email, index) => (
+                        <p key={index} className="text-sm">
+                          {index + 1}. {email}
+                        </p>
+                      ))
+                    }
+                  </div>
+                </div>
+              )}
 
               <div className="flex space-x-2">
                 <Button

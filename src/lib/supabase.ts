@@ -33,13 +33,13 @@ export interface Applicant {
   created_at?: string
   full_name: string
   email: string
-  university: string
   track_selection: 'beginner' | 'advanced'
-  skills: string[]
+  skills?: string[]
   experience: string
   motivation: string
   github_url?: string
   linkedin_url?: string
   portfolio_url?: string
-  team_preference: 'individual' | 'team' | 'no_preference'
+  team_preference: 'individual' | 'team' | 'have_team'
+  team_members?: string[]
 }

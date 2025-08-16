@@ -10,26 +10,19 @@ import { Checkbox } from "./ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Progress } from "./ui/progress";
-import { Badge } from "./ui/badge";
+
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { Applicant } from "../lib/supabase";
 import { Popup } from "./ui/popup";
 
-const skillOptions = [
-  "JavaScript", "Python", "Java", "C++", "C#", "Go", "Rust", "Swift", "Kotlin",
-  "React", "Vue", "Angular", "Node.js", "Express", "Django", "Flask", "Spring",
-  "HTML/CSS", "TypeScript", "PHP", "Ruby", "Scala", "Elixir", "Haskell",
-  "Machine Learning", "Data Science", "DevOps", "Cloud Computing", "Mobile Development",
-  "Game Development", "Cybersecurity", "Blockchain", "IoT", "AR/VR"
-];
+
 
 const steps = [
   { id: 1, title: "Personal Info" },
-  { id: 2, title: "Academic & Skills" },
-  { id: 3, title: "Experience & Motivation" },
-  { id: 4, title: "Additional Info" },
-  { id: 5, title: "Review & Submit" }
+  { id: 2, title: "Experience & Motivation" },
+  { id: 3, title: "Additional Info" },
+  { id: 4, title: "Review & Submit" }
 ];
 
 export function ApplicationForm() {
@@ -73,15 +66,14 @@ export function ApplicationForm() {
     defaultValues: {
       full_name: "",
       email: "",
-      university: "",
       track_selection: undefined,
-      skills: [],
       experience: "",
       motivation: "",
       github_url: "",
       linkedin_url: "",
       portfolio_url: "",
-      team_preference: undefined
+      team_preference: undefined,
+      team_members: []
     },
     mode: "onChange"
   });
@@ -141,9 +133,36 @@ export function ApplicationForm() {
       }
     
       console.log('Success! Data inserted:', result);
-      showPopup("success", "Application Submitted", "Application submitted successfully! 🎉");
+      
+      // Send confirmation email
+      try {
+        const emailResponse = await fetch(`${supabase.supabaseUrl}/functions/v1/send-application-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabase.supabaseKey}`,
+          },
+          body: JSON.stringify({ applicant: data }),
+        });
+        
+        if (emailResponse.ok) {
+          console.log('Confirmation email sent successfully');
+        } else {
+          console.warn('Failed to send confirmation email:', await emailResponse.text());
+        }
+      } catch (emailError) {
+        console.warn('Error sending confirmation email:', emailError);
+        // Don't fail the form submission if email fails
+      }
+      
+      showPopup("success", "Application Submitted", "Application submitted successfully! 🎉 You'll be redirected to the landing page in a few seconds.");
       reset();
       setCurrentStep(1);
+      
+      // Redirect back to landing page after a short delay
+      setTimeout(() => {
+        window.location.hash = '#/';
+      }, 2000);
     } catch (error) {
       console.error('Error submitting application:', error);
       showPopup("error", "Submission Failed", `Failed to submit application: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -245,111 +264,10 @@ export function ApplicationForm() {
           </Card>
         )}
 
-        {/* Step 2: Academic & Skills */}
-        {currentStep === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Academic & Skills</CardTitle>
-              <CardDescription>
-                Your educational background and technical skills
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="university">University/Institution *</Label>
-                  <Input
-                    id="university"
-                    {...register("university", { required: "University is required" })}
-                    placeholder="Stanford University"
-                  />
-                  {errors.university && (
-                    <p className="text-sm text-destructive mt-1">{errors.university.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label>Track Selection *</Label>
-                  <div className="space-y-3 mt-2">
-                    <div className="flex items-center space-x-2">
-                      <Controller
-                        name="track_selection"
-                        control={control}
-                        render={({ field }) => (
-                          <Checkbox
-                            id="beginner_track"
-                            checked={field.value === 'beginner'}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                field.onChange('beginner');
-                              }
-                            }}
-                          />
-                        )}
-                      />
-                      <Label htmlFor="beginner_track" className="text-sm">Beginner Track</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Controller
-                        name="track_selection"
-                        control={control}
-                        render={({ field }) => (
-                          <Checkbox
-                            id="advanced_track"
-                            checked={field.value === 'advanced'}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                field.onChange('advanced');
-                              }
-                            }}
-                          />
-                        )}
-                      />
-                      <Label htmlFor="advanced_track" className="text-sm">Advanced Track</Label>
-                    </div>
-                  </div>
-                  {errors.track_selection && (
-                    <p className="text-sm text-destructive mt-1">Please select a track</p>
-                  )}
-                </div>
-              </div>
-              
-              <div>
-                <Label>Technical Skills *</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {skillOptions.map((skill) => (
-                    <div key={skill} className="flex items-center space-x-2">
-                      <Controller
-                        name="skills"
-                        control={control}
-                        render={({ field }) => (
-                          <Checkbox
-                            id={skill}
-                            checked={field.value?.includes(skill)}
-                            onCheckedChange={(checked) => {
-                              const currentSkills = field.value || [];
-                              if (checked) {
-                                field.onChange([...currentSkills, skill]);
-                              } else {
-                                field.onChange(currentSkills.filter(s => s !== skill));
-                              }
-                            }}
-                          />
-                        )}
-                      />
-                      <Label htmlFor={skill} className="text-sm">{skill}</Label>
-                    </div>
-                  ))}
-                </div>
-                {errors.skills && (
-                  <p className="text-sm text-destructive mt-1">Please select at least one skill</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
-        {/* Step 3: Experience & Motivation */}
-        {currentStep === 3 && (
+
+        {/* Step 2: Experience & Motivation */}
+        {currentStep === 2 && (
           <Card>
             <CardHeader>
               <CardTitle>Experience & Motivation</CardTitle>
@@ -381,6 +299,61 @@ export function ApplicationForm() {
                 />
                 {errors.motivation && (
                   <p className="text-sm text-destructive mt-1">{errors.motivation.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label>Track Selection *</Label>
+                <div className="space-y-3 mt-2">
+                  <div className="flex items-center space-x-2">
+                    <Controller
+                      name="track_selection"
+                      control={control}
+                      rules={{ required: "Please select a track" }}
+                      render={({ field }) => (
+                        <>
+                          <Checkbox
+                            id="beginner"
+                            checked={field.value === 'beginner'}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                field.onChange('beginner');
+                              }
+                            }}
+                          />
+                          <Label htmlFor="beginner" className="text-sm font-normal">
+                            <span className="font-medium">Beginner Track</span> - Perfect for newcomers to robotics and AI
+                          </Label>
+                        </>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Controller
+                      name="track_selection"
+                      control={control}
+                      render={({ field }) => (
+                        <>
+                          <Checkbox
+                            id="advanced"
+                            checked={field.value === 'advanced'}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                field.onChange('advanced');
+                              }
+                            }}
+                          />
+                          <Label htmlFor="advanced" className="text-sm font-normal">
+                            <span className="font-medium">Advanced Track</span> - For teams familiar with robotics and simulation
+                          </Label>
+                        </>
+                      )}
+                    />
+                  </div>
+                </div>
+                {errors.track_selection && (
+                  <p className="text-sm text-destructive mt-1">Please select a track</p>
                 )}
               </div>
 
@@ -416,8 +389,8 @@ export function ApplicationForm() {
           </Card>
         )}
 
-        {/* Step 4: Additional Information */}
-        {currentStep === 4 && (
+        {/* Step 3: Additional Information */}
+        {currentStep === 3 && (
           <Card>
             <CardHeader>
               <CardTitle>Additional Information</CardTitle>
@@ -440,7 +413,7 @@ export function ApplicationForm() {
                       <SelectContent>
                         <SelectItem value="individual">Work individually</SelectItem>
                         <SelectItem value="team">Join a team</SelectItem>
-                        <SelectItem value="no_preference">No preference</SelectItem>
+                        <SelectItem value="have_team">Have a team</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -450,15 +423,48 @@ export function ApplicationForm() {
                 )}
               </div>
 
-
-
+              {/* Team Members - only show if "Have a team" is selected */}
+              {watchedValues.team_preference === 'have_team' && (
+                <div className="space-y-3">
+                  <Label>Team Members (up to 4 email addresses) *</Label>
+                  <div className="space-y-2">
+                    {[0, 1, 2, 3].map((index) => (
+                      <div key={index}>
+                        <Label htmlFor={`team_member_${index}`} className="text-sm text-muted-foreground">
+                          {index === 0 ? 'Team Member 1 (required)' : `Team Member ${index + 1} (optional)`}
+                        </Label>
+                        <Input
+                          id={`team_member_${index}`}
+                          type="email"
+                          {...register(`team_members.${index}` as const, {
+                            required: index === 0 ? "At least one team member email is required" : false,
+                            pattern: {
+                              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                              message: "Please enter a valid email address"
+                            }
+                          })}
+                          placeholder={`teammate${index + 1}@example.com`}
+                        />
+                        {errors.team_members?.[index] && (
+                          <p className="text-sm text-destructive mt-1">
+                            {errors.team_members[index]?.message}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    💡 Please provide the email addresses of your team members. At least one is required.
+                  </p>
+                </div>
+              )}
 
             </CardContent>
           </Card>
         )}
 
-        {/* Step 5: Review & Submit */}
-        {currentStep === 5 && (
+        {/* Step 4: Review & Submit */}
+        {currentStep === 4 && (
           <Card>
             <CardHeader>
               <CardTitle>Review Your Application</CardTitle>
@@ -476,23 +482,15 @@ export function ApplicationForm() {
                     <p><span className="font-medium">Email:</span> {watchedValues.email}</p>
                   </div>
                 </div>
-                <div>
-                  <Label className="font-medium">Academic Information</Label>
-                  <div className="mt-2 space-y-1 text-sm">
-                    <p><span className="font-medium">University:</span> {watchedValues.university}</p>
-                    <p><span className="font-medium">Track:</span> {watchedValues.track_selection === 'beginner' ? 'Beginner Track' : watchedValues.track_selection === 'advanced' ? 'Advanced Track' : 'Not selected'}</p>
-                  </div>
+                              <div>
+                <Label className="font-medium">Track Selection</Label>
+                <div className="mt-2 space-y-1 text-sm">
+                  <p><span className="font-medium">Track:</span> {watchedValues.track_selection === 'beginner' ? 'Beginner Track' : watchedValues.track_selection === 'advanced' ? 'Advanced Track' : 'Not selected'}</p>
                 </div>
+              </div>
               </div>
 
-              <div>
-                <Label className="font-medium">Skills</Label>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {watchedValues.skills?.map((skill) => (
-                    <Badge key={skill} variant="secondary">{skill}</Badge>
-                  ))}
-                </div>
-              </div>
+
 
               <div>
                 <Label className="font-medium">Experience</Label>
@@ -509,10 +507,26 @@ export function ApplicationForm() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   {watchedValues.team_preference === 'individual' ? 'Work individually' : 
                    watchedValues.team_preference === 'team' ? 'Join a team' : 
-                   watchedValues.team_preference === 'no_preference' ? 'No preference' : 'Not selected'}
+                   watchedValues.team_preference === 'have_team' ? 'Have a team' : 'Not selected'}
                 </p>
               </div>
 
+              {/* Show team members if provided */}
+              {watchedValues.team_preference === 'have_team' && watchedValues.team_members && (
+                <div>
+                  <Label className="font-medium">Team Members</Label>
+                  <div className="mt-2 space-y-1">
+                    {watchedValues.team_members
+                      .filter(email => email && email.trim() !== '')
+                      .map((email, index) => (
+                        <p key={index} className="text-sm text-muted-foreground">
+                          {index + 1}. {email}
+                        </p>
+                      ))
+                    }
+                  </div>
+                </div>
+              )}
 
             </CardContent>
           </Card>

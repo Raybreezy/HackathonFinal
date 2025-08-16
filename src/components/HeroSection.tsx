@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Calendar, MapPin } from "lucide-react";
-import roboticsImage from "/banner.jpeg";
+import roboticsImage from "/bannerold.png";
 
 interface HeroSectionProps {
   onRegisterClick: () => void;
@@ -13,13 +13,13 @@ export function HeroSection({ onRegisterClick }: HeroSectionProps) {
       className="relative h-screen flex items-center justify-center px-6"
       style={{
         backgroundImage: `url(${roboticsImage})`,
-        backgroundSize: '100% 100%',
+        backgroundSize: 'cover',
         backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
+        filter: 'contrast(1.1) saturate(1.1)'
       }}
     >
-      {/* Dark overlay for text readability */}
-      <div className="absolute top-0 left-0 right-0 bottom-32 bg-black/40 bg-[rgba(0,0,0,0)]"></div>
+
       
       <div className="relative max-w-4xl mx-auto text-center space-y-8 z-10">
         <Badge variant="secondary" className="mb-4 bg-white/90 text-black">
