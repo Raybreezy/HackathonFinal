@@ -118,7 +118,7 @@ export function SponsorsSection() {
                       />
                     </a>
                   ) : sponsor.name === "Tianji" ? (
-                    <a href="https://www.tianji.com/" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.tianjizn.com/" target="_blank" rel="noopener noreferrer">
                       <img 
                         src={sponsor.image} 
                         alt={`${sponsor.name} logo`}
