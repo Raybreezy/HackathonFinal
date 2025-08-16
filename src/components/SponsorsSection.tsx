@@ -7,9 +7,9 @@ const sponsors = [
     logo: null
   },
   {
-    name: "AWS",
-    image: "/sponsors/aws_startups.png",
-    logo: "AWS"
+    name: "BAIR",
+    image: "/sponsors/BAIR.png",
+    logo: "BR"
   },
   {
     name: "Intel",
@@ -22,9 +22,9 @@ const sponsors = [
     logo: "CH"
   },
   {
-    name: "BAIR",
-    image: "/sponsors/BAIR.png",
-    logo: "BR"
+    name: "AWS",
+    image: "/sponsors/aws_startups.png",
+    logo: "AWS"
   },
   {
     name: "Akash",
