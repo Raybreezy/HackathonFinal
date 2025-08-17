@@ -32,11 +32,6 @@ const sponsors = [
     logo: "AK"
   },
   {
-    name: "Rokae",
-    image: "/sponsors/1755239885030.jpg",
-    logo: "RK"
-  },
-  {
     name: "Tianji",
     image: "/sponsors/1755239892665.jpg",
     logo: "TJ"
@@ -103,14 +98,6 @@ export function SponsorsSection() {
                     </a>
                   ) : sponsor.name === "Akash" ? (
                     <a href="https://akash.network/" target="_blank" rel="noopener noreferrer">
-                      <img 
-                        src={sponsor.image} 
-                        alt={`${sponsor.name} logo`}
-                        className="object-contain w-36 h-24 hover:opacity-80 transition-opacity cursor-pointer"
-                      />
-                    </a>
-                  ) : sponsor.name === "Rokae" ? (
-                    <a href="https://www.rokae.com/" target="_blank" rel="noopener noreferrer">
                       <img 
                         src={sponsor.image} 
                         alt={`${sponsor.name} logo`}
