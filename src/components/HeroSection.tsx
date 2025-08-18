@@ -36,7 +36,7 @@ export function HeroSection({ onRegisterClick }: HeroSectionProps) {
           />
         </div>
         
-        <h2 className="text-base md:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg mb-6">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg mb-6">
           Global Hackathon
         </h2>
         
