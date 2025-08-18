@@ -2,6 +2,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Calendar, MapPin } from "lucide-react";
 import roboticsImage from "/banner.png";
+import titleImage from "/Title.png";
 
 interface HeroSectionProps {
   onRegisterClick: () => void;
@@ -26,12 +27,21 @@ export function HeroSection({ onRegisterClick }: HeroSectionProps) {
           Registration Open
         </Badge>
         
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white drop-shadow-lg">
-          Reborn x Roboverse x Unitree Global Hackathon 
-        </h1>
+        <div className="flex justify-center mb-8">
+          <img 
+            src={titleImage} 
+            alt="Reborn x Roboverse x Unitree Global Hackathon" 
+            className="max-w-full h-auto drop-shadow-lg mx-auto"
+            style={{ maxHeight: '2700px', marginLeft: '-5px' }}
+          />
+        </div>
+        
+        <h2 className="text-base md:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg mb-6">
+          Global Hackathon
+        </h2>
         
         <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
-          Reborn's first global hackathon, challenge yourself whilst learning about robotics simulation! For developers of all level whether you are familiar with robotics simulation or complete beginners
+          The ultimate robotics + simulation challenge is here! Challenge yourself whilst learning about robotics simulation. For developers of all level whether you are familiar with robotics simulation or complete beginners
         </p>
         
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm">
