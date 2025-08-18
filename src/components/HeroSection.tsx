@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Calendar, MapPin } from "lucide-react";
-import roboticsImage from "/bannerold.png";
+import roboticsImage from "/banner.png";
 
 interface HeroSectionProps {
   onRegisterClick: () => void;
