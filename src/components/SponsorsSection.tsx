@@ -17,6 +17,11 @@ const sponsors = [
     logo: "IN"
   },
   {
+    name: "Real Sense",
+    image: "/sponsors/RealSense-Logo_1536x1000.jpg",
+    logo: "RS"
+  },
+  {
     name: "Coohom",
     image: "/sponsors/黑色组合.png",
     logo: "CH"
@@ -82,6 +87,14 @@ export function SponsorsSection() {
                     </a>
                   ) : sponsor.name === "Intel" ? (
                     <a href="https://www.intel.com/content/www/us/en/homepage.html" target="_blank" rel="noopener noreferrer">
+                      <img 
+                        src={sponsor.image} 
+                        alt={`${sponsor.name} logo`}
+                        className="object-contain w-36 h-24 hover:opacity-80 transition-opacity cursor-pointer"
+                      />
+                    </a>
+                  ) : sponsor.name === "Real Sense" ? (
+                    <a href="https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html" target="_blank" rel="noopener noreferrer">
                       <img 
                         src={sponsor.image} 
                         alt={`${sponsor.name} logo`}

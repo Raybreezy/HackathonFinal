@@ -47,7 +47,7 @@ export function HeroSection({ onRegisterClick }: HeroSectionProps) {
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm">
           <div className="flex items-center gap-2 text-white/90">
             <Calendar className="h-5 w-5 text-white" />
-            <span>September 29- October 6, 2025</span>
+            <span>October 27 - November 3, 2025</span>
           </div>
           <div className="flex items-center gap-2 text-white/90">
             <MapPin className="h-5 w-5 text-white" />
@@ -76,7 +76,7 @@ export function HeroSection({ onRegisterClick }: HeroSectionProps) {
         </div>
         
         <div className="text-sm text-white/80">
-          Registration closes on September 28th, 2025
+          Registration closes on October 26th, 2025
         </div>
       </div>
     </section>
